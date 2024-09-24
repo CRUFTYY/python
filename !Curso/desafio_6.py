@@ -1,12 +1,15 @@
+import os
 import streamlit as st
-import requests
-import datetime
+from groq import Groq
 
-# Configuración de la API de Groq
-GROQ_API_URL = "https://api.groq.com/v1/query"
+# Configuración de la API de Groq a través de variables de entorno
 API_KEY = "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"
+os.environ["GROQ_API_KEY"] = API_KEY
 
-st.set_page_config(page_title="ELÍAS IA ", page_icon="😎", layout="centered")
+# Crear el cliente de Groq
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+st.set_page_config(page_title="ELÍAS IA", page_icon="😎", layout="centered")
 
 # Configuración de la página
 def configurar_pagina():
@@ -19,19 +22,19 @@ modelo = configurar_pagina()
 
 # Función para generar respuestas usando la API de Groq
 def generar_respuesta_groq(mensaje):
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "query": mensaje,
-        "temperature": 0.7
-    }
-    response = requests.post(GROQ_API_URL, headers=headers, json=data)
-    if response.status_code == 200:
-        return response.json().get("answer", "Lo siento, no pude obtener una respuesta.")
-    else:
-        return "Error en la API de Groq."
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": mensaje,
+                }
+            ],
+            model="llama3-8b-8192",  # Asegurate de usar el modelo correcto
+        )
+        return chat_completion.choices[0].message.content
+    except Exception as e:
+        return f"Error en la API de Groq: {str(e)}"
 
 # Función para generar la respuesta del chatbot
 def generar_respuesta(mensaje):
