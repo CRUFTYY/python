@@ -1,17 +1,14 @@
-import os
 import streamlit as st
-from groq import Groq
+import requests
+import datetime  
 
-# Configuración de la API de Groq a través de variables de entorno
+
+GROQ_API_URL = "https://api.groq.com/v1/query"
 API_KEY = "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"
-os.environ["GROQ_API_KEY"] = API_KEY
-
-# Crear el cliente de Groq
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 st.set_page_config(page_title="ELÍAS IA", page_icon="😎", layout="centered")
 
-# Configuración de la página
+
 def configurar_pagina():
     st.title("Chatbot de IA")
     st.sidebar.title("Configuración de la IA")
@@ -20,23 +17,23 @@ def configurar_pagina():
 
 modelo = configurar_pagina()
 
-# Función para generar respuestas usando la API de Groq
-def generar_respuesta_groq(mensaje):
-    try:
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": mensaje,
-                }
-            ],
-            model="llama3-8b-8192",  # Asegurate de usar el modelo correcto
-        )
-        return chat_completion.choices[0].message.content
-    except Exception as e:
-        return f"Error en la API de Groq: {str(e)}"
 
-# Función para generar la respuesta del chatbot
+def generar_respuesta_groq(mensaje):
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "query": mensaje,
+        "temperature": 0.7
+    }
+    response = requests.post(GROQ_API_URL, headers=headers, json=data)
+    if response.status_code == 200:
+        return response.json().get("answer", "Lo siento, no pude obtener una respuesta.")
+    else:
+        return "Error en la API de Groq."
+
+
 def generar_respuesta(mensaje):
     if "crufty" in mensaje.lower():
         st.success("Felicitaciones, has mencionado a el mejor de la historia.")
@@ -47,7 +44,7 @@ def generar_respuesta(mensaje):
 if 'historial' not in st.session_state:
     st.session_state.historial = []
 
-# Mensaje del usuario
+
 mensaje = st.chat_input("Escribí tu mensaje:")
 
 if mensaje:
