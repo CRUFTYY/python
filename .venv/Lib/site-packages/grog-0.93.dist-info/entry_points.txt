@@ -1,0 +1,3 @@
+[console_scripts]
+grog-tool = grog.grog:main
+
