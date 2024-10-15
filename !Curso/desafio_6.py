@@ -1,50 +1,49 @@
 import streamlit as st
-from groq import Groq
 import datetime
+import openai  # Asegúrate de tener la librería openai instalada
 
-# Usar tu API Key directamente (recomendado solo para pruebas)
-API_KEY = "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"
+# Obtener la API Key desde los secretos de Streamlit Cloud
+API_KEY = "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"  # Cambié aquí para que obtenga la clave de los secretos
 
-# Crea el cliente de Groq
-client = Groq(api_key=API_KEY)
+# Configura la API de OpenAI con la clave
+openai.api_key = API_KEY
 
+# Configuración de la página
 st.set_page_config(page_title="ELÍAS IA", page_icon="😎", layout="centered")
-
 
 def configurar_pagina():
     st.title("Chatbot de IA")
     st.sidebar.title("Configuración de la IA")
-    st.sidebar.write("Modelo seleccionado: Groq")
-    return "Groq"
-
+    st.sidebar.write("Modelo seleccionado: OpenAI ChatGPT")
+    return "ChatGPT"
 
 modelo = configurar_pagina()
 
-
-def generar_respuesta_groq(mensaje):
+# Función para generar una respuesta utilizando la API de OpenAI
+def generar_respuesta_openai(mensaje):
     try:
-        chat_completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": mensaje}],
-            model="llama3-8b-8192",  # Asegúrate de usar el modelo correcto
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Asegúrate de usar el modelo correcto
+            messages=[{"role": "user", "content": mensaje}]
         )
-        return chat_completion.choices[0].message.content
+        return response['choices'][0]['message']['content']
     except Exception as e:
-        st.error(f"Error al obtener respuesta de Groq: {e}")
-        return "Error en la API de Groq."
+        st.error(f"Error al obtener respuesta de OpenAI: {e}")
+        return "Error en la API de OpenAI."
 
-
+# Función principal para generar la respuesta del chatbot
 def generar_respuesta(mensaje):
     if "crufty" in mensaje.lower():
-        st.success("Felicitaciones, has mencionado a el mejor de la historia.")
+        st.success("Felicitaciones, has mencionado al mejor de la historia.")
         return "Crufty? El mejor de todos los tiempos."
     
-    return generar_respuesta_groq(mensaje)
+    return generar_respuesta_openai(mensaje)
 
-
+# Manejar el historial de conversaciones en la sesión
 if 'historial' not in st.session_state:
     st.session_state.historial = []
 
-
+# Entrada de texto para el mensaje del usuario
 mensaje = st.chat_input("Escribí tu mensaje:")
 
 if mensaje:
@@ -52,7 +51,7 @@ if mensaje:
     st.session_state.historial.append((datetime.datetime.now(), mensaje, respuesta))
     st.write(respuesta)
 
-# Historial y sidebar
+# Mostrar historial de conversaciones en la sidebar
 st.sidebar.header("Historial de Conversaciones")
 if st.session_state.historial:
     for fecha, msg, resp in st.session_state.historial:
@@ -61,21 +60,22 @@ if st.session_state.historial:
         st.sidebar.write(f"**Bot:** {resp}")
         st.sidebar.write("---")
 
+# Consejos de uso en la sidebar
 st.sidebar.header("Consejos de Uso")
 st.sidebar.write("1. Podes preguntar sobre cualquier tema.")
 st.sidebar.write("2. Usa palabras clave para obtener respuestas más precisas.")
 st.sidebar.write("3. Si necesitas ayuda, no dudes en preguntar.")
-st.sidebar.write("4. Recordá que es un chatbot hecho por el genio de CRUFTY")
+st.sidebar.write("4. Recordá que es un chatbot hecho por el genio de CRUFTY.")
 
-# Información adicional
+# Información adicional en la sidebar
 def mostrar_informacion_adicional():
     st.sidebar.header("Información Adicional")
-    st.sidebar.write("Este chatbot está diseñado por CRUFTY")
+    st.sidebar.write("Este chatbot está diseñado por CRUFTY.")
     st.sidebar.write("Cuidadito con lo que le preguntás a la IA.")
 
 mostrar_informacion_adicional()
 
-# Resetear historial
+# Opción para resetear el historial de conversaciones
 def resetear_historial():
     if st.sidebar.button("Resetear Historial"):
         st.session_state.historial = []
@@ -83,7 +83,7 @@ def resetear_historial():
 
 resetear_historial()
 
-# Mostrar estadísticas
+# Mostrar estadísticas en la sidebar
 def mostrar_estadisticas():
     total_mensajes = len(st.session_state.historial)
     st.sidebar.header("Estadísticas")
