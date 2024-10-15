@@ -3,7 +3,7 @@ import datetime
 from groq import Groq
 
 # Obtener la API Key desde los secretos de Streamlit Cloud
-API_KEY = st.secrets["API_KEY"]
+API_KEY = "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"
 
 # Crea el cliente de Groq con la API Key
 client = Groq(api_key=API_KEY)
