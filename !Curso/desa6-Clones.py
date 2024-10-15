@@ -3,7 +3,7 @@ import datetime
 import openai  # Asegúrate de tener la librería openai instalada
 
 # Obtener la API Key desde los secretos de Streamlit Cloud
-API_KEY = "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"  # Cambié aquí para que obtenga la clave de los secretos
+API_KEY = "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"  # Cambié aquí para que obtenga la clave de los secretos
 
 # Configura la API de OpenAI con la clave
 openai.api_key = API_KEY
