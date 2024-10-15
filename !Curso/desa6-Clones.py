@@ -1,12 +1,12 @@
 import streamlit as st
 import datetime
-import openai  # Asegúrate de tener la librería openai instalada
+from groq import Groq
 
 # Obtener la API Key desde los secretos de Streamlit Cloud
-API_KEY = "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"  # Cambié aquí para que obtenga la clave de los secretos
+API_KEY = "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"
 
-# Configura la API de OpenAI con la clave
-openai.api_key = API_KEY
+# Crea el cliente de Groq con la API Key
+client = Groq(api_key=API_KEY)
 
 # Configuración de la página
 st.set_page_config(page_title="ELÍAS IA", page_icon="😎", layout="centered")
@@ -14,22 +14,22 @@ st.set_page_config(page_title="ELÍAS IA", page_icon="😎", layout="centered")
 def configurar_pagina():
     st.title("Chatbot de IA")
     st.sidebar.title("Configuración de la IA")
-    st.sidebar.write("Modelo seleccionado: OpenAI ChatGPT")
-    return "ChatGPT"
+    st.sidebar.write("Modelo seleccionado: Groq")
+    return "Groq"
 
 modelo = configurar_pagina()
 
-# Función para generar una respuesta utilizando la API de OpenAI
-def generar_respuesta_openai(mensaje):
+# Función para generar una respuesta utilizando la API de Groq
+def generar_respuesta_groq(mensaje):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Asegúrate de usar el modelo correcto
-            messages=[{"role": "user", "content": mensaje}]
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": mensaje}],
+            model="llama3-8b-8192",  # Asegúrate de usar el modelo correcto
         )
-        return response['choices'][0]['message']['content']
+        return chat_completion.choices[0].message.content
     except Exception as e:
-        st.error(f"Error al obtener respuesta de OpenAI: {e}")
-        return "Error en la API de OpenAI."
+        st.error(f"Error al obtener respuesta de Groq: {e}")
+        return "Error en la API de Groq."
 
 # Función principal para generar la respuesta del chatbot
 def generar_respuesta(mensaje):
@@ -37,7 +37,7 @@ def generar_respuesta(mensaje):
         st.success("Felicitaciones, has mencionado al mejor de la historia.")
         return "Crufty? El mejor de todos los tiempos."
     
-    return generar_respuesta_openai(mensaje)
+    return generar_respuesta_groq(mensaje)
 
 # Manejar el historial de conversaciones en la sesión
 if 'historial' not in st.session_state:
